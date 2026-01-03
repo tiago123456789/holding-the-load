@@ -1,0 +1,33 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "holding-theload",
+	"main": "src/index.ts",
+	"observability": {
+		"enabled": true
+	},
+	"durable_objects": {
+		"bindings": [
+			{
+				"class_name": "Queue",
+				"name": "QUEUE"
+			}
+		]
+	},
+
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["Queue"]
+		}
+	],
+
+	"vars": {
+		"API_KEY": "test",
+		"ENABLE_SAVE_MANY_ONE_ROW": false
+	},
+	"compatibility_date": "2025-09-24"
+}

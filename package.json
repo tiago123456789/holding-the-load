@@ -1,0 +1,24 @@
+{
+	"name": "holding-theload",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"remove": "wrangler delete",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"test": "vitest",
+		"cf-typegen": "wrangler types"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.8.19",
+		"typescript": "^5.5.2",
+		"vitest": "~3.2.0",
+		"wrangler": "^4.56.0"
+	},
+	"dependencies": {
+		"axios": "^1.13.2",
+		"hono": "^4.11.3"
+	}
+}

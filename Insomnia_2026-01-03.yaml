@@ -1,0 +1,124 @@
+type: collection.insomnia.rest/5.0
+name: Holding the load
+meta:
+  id: wrk_ea65fa9e37ca494985713f4c891701fa
+  created: 1766909858827
+  modified: 1767471110004
+collection:
+  - url: "{{ _.BASE_URL }}/pull-events?total=500"
+    name: Pull events
+    meta:
+      id: req_0d9b5039470c4b3d987b64e14ef94c17
+      created: 1766934716745
+      modified: 1767473975744
+      isPrivate: false
+      sortKey: -1766820603146.6875
+    method: GET
+    body:
+      mimeType: application/json
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_b5c3d553688446dc9b8475bb4b8c8ec4
+      - name: User-Agent
+        value: insomnia/11.0.2
+        id: pair_4f47845027df40f7b02138a0d849bfc4
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.BASE_URL }}/stats"
+    name: Get stats
+    meta:
+      id: req_4154ea94e0df49c2b933d69a192e462c
+      created: 1767448989696
+      modified: 1767473979303
+      isPrivate: false
+      sortKey: -1766784085426.4688
+    method: GET
+    body:
+      mimeType: application/json
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_2b973896130d4d62baff544ca3673b74
+      - name: User-Agent
+        value: insomnia/11.0.2
+        id: pair_5f5c2b10ef9f4414b994459afcc5bb91
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.BASE_URL }}/new-events"
+    name: Publish new event
+    meta:
+      id: req_809b903367ae4bccac0c05d7157de499
+      created: 1767469990115
+      modified: 1767473984442
+      isPrivate: false
+      sortKey: -1766882480394.836
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"payload": {
+        		"id": 1,
+        		"email": "test@gmail.com"
+        	}
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_87afeee31ef14c019eacf79706e2376e
+      - name: User-Agent
+        value: insomnia/11.0.2
+        id: pair_d5639e4ab53344bf834f35bf04aa5d16
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_18f04c0a3131d40c8776c8e798c0bc707f561c90
+    created: 1766909858956
+    modified: 1766909858956
+environments:
+  name: Base Environment
+  meta:
+    id: env_18f04c0a3131d40c8776c8e798c0bc707f561c90
+    created: 1766909858900
+    modified: 1766909858900
+    isPrivate: false
+  subEnvironments:
+    - name: Dev
+      meta:
+        id: env_5d54e9c5bdd64290b78bccb71a617f19
+        created: 1766927996403
+        modified: 1766930570579
+        isPrivate: false
+        sortKey: 1766927996403
+      data:
+        BASE_URL: http://localhost:8787
+    - name: STAGING
+      meta:
+        id: env_e31f3a04b7f4487ba46dc51db2346443
+        created: 1766928008254
+        modified: 1767469421627
+        isPrivate: false
+        sortKey: 1766928008254
+      data:
+        BASE_URL: https://holding-theload.tiagorosadacost.workers.dev
