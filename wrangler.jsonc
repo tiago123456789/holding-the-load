@@ -24,9 +24,8 @@
 			"new_sqlite_classes": ["Queue"]
 		}
 	],
-
 	"vars": {
-		"API_KEY": "test",
+		"API_KEY": "api_key_value_here",
 		"ENABLE_SAVE_MANY_ONE_ROW": false
 	},
 	"compatibility_date": "2025-09-24"
