@@ -32,7 +32,7 @@ This is the motivation behind **Holding The Load**: Cloudflare handles spikes an
 
 - **Queue Management**: Efficiently queue incoming requests during high load.
 - **Batch Processing**: Pull requests individually or in batches.
-- **Group id**: seperate the webhooks based application or automation
+- **Group id**: seperate the webhooks based application or automation. Ps: to add your own Group ids open the file **groups.json** on root of project.
 - **Scalable Storage**: Uses Durable Objects with SQLite for reliable data persistence.
 - **Cost-Effective**: Low-cost solution for handling traffic spikes.
 
