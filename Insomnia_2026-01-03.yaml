@@ -5,12 +5,12 @@ meta:
   created: 1766909858827
   modified: 1767471110004
 collection:
-  - url: "{{ _.BASE_URL }}/pull-events?total=500"
+  - url: "{{ _.BASE_URL }}/pull-events?total=1"
     name: Pull events
     meta:
       id: req_0d9b5039470c4b3d987b64e14ef94c17
       created: 1766934716745
-      modified: 1767473975744
+      modified: 1768179332878
       isPrivate: false
       sortKey: -1766820603146.6875
     method: GET
@@ -23,6 +23,9 @@ collection:
       - name: User-Agent
         value: insomnia/11.0.2
         id: pair_4f47845027df40f7b02138a0d849bfc4
+      - id: pair_0067df11b1844507abb5daeaaf704218
+        name: x-api-key
+        disabled: false
     settings:
       renderRequestBody: true
       encodeUrl: true
@@ -36,7 +39,7 @@ collection:
     meta:
       id: req_4154ea94e0df49c2b933d69a192e462c
       created: 1767448989696
-      modified: 1767473979303
+      modified: 1768179347355
       isPrivate: false
       sortKey: -1766784085426.4688
     method: GET
@@ -49,6 +52,9 @@ collection:
       - name: User-Agent
         value: insomnia/11.0.2
         id: pair_5f5c2b10ef9f4414b994459afcc5bb91
+      - id: pair_b93b28af3ca04e56bc95e825f0b46cfb
+        name: x-api-key
+        disabled: false
     settings:
       renderRequestBody: true
       encodeUrl: true
@@ -62,7 +68,7 @@ collection:
     meta:
       id: req_809b903367ae4bccac0c05d7157de499
       created: 1767469990115
-      modified: 1767473984442
+      modified: 1768179340915
       isPrivate: false
       sortKey: -1766882480394.836
     method: POST
@@ -70,10 +76,8 @@ collection:
       mimeType: application/json
       text: |-
         {
-        	"payload": {
-        		"id": 1,
-        		"email": "test@gmail.com"
-        	}
+        	"message": "Hi {% faker 'randomUUID' %}",
+        	"timestamp": "{% faker 'timestamp' %}"
         }
     headers:
       - name: Content-Type
@@ -82,6 +86,38 @@ collection:
       - name: User-Agent
         value: insomnia/11.0.2
         id: pair_d5639e4ab53344bf834f35bf04aa5d16
+      - id: pair_6ed984f46924400ab321a6fc499bedf3
+        name: x-api-key
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.BASE_URL }}/dashboard"
+    name: Dashboard
+    meta:
+      id: req_afcfc798ad7f4a4b91ecd28cb9009c42
+      created: 1768176097894
+      modified: 1768179351174
+      isPrivate: false
+      sortKey: -1766783578235.9102
+    method: GET
+    body:
+      mimeType: application/json
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_2b973896130d4d62baff544ca3673b74
+      - name: User-Agent
+        value: insomnia/11.0.2
+        id: pair_5f5c2b10ef9f4414b994459afcc5bb91
+      - id: pair_b93b28af3ca04e56bc95e825f0b46cfb
+        name: x-api-key
+        disabled: false
     settings:
       renderRequestBody: true
       encodeUrl: true
@@ -108,7 +144,7 @@ environments:
       meta:
         id: env_5d54e9c5bdd64290b78bccb71a617f19
         created: 1766927996403
-        modified: 1766930570579
+        modified: 1768175522657
         isPrivate: false
         sortKey: 1766927996403
       data:
@@ -117,7 +153,7 @@ environments:
       meta:
         id: env_e31f3a04b7f4487ba46dc51db2346443
         created: 1766928008254
-        modified: 1767469421627
+        modified: 1768178260348
         isPrivate: false
         sortKey: 1766928008254
       data:

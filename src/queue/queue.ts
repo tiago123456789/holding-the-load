@@ -43,7 +43,7 @@ export class Queue extends DurableObject {
 			`);
 	}
 
-	private async setupAlarm() {
+	async setupAlarm() {
 		const nextAlarmTime = new Date();
 		nextAlarmTime.setSeconds(nextAlarmTime.getSeconds() + 2);
 		await this.ctx.storage.setAlarm(nextAlarmTime);
@@ -172,7 +172,6 @@ export class Queue extends DurableObject {
 			for (const message of results) {
 				let items = this.parsePayload(message.requestBody as string);
 				if (typeof items != 'string' && Array.isArray(items)) {
-					console.log(items);
 					items = (items || []).map((item: { [key: string]: any }) => {
 						item.requestBody = this.parsePayload(item.requestBody);
 						return item;
@@ -247,5 +246,22 @@ export class Queue extends DurableObject {
 		return {
 			totalRequestsWaiting: totalRequestsWaiting.toArray()[0].total,
 		};
+	}
+
+	async getLastItems(limit: number = 10): Promise<Array<{ id: string; requestBody: string; createdAt: number }>> {
+		const results = await this.ctx.storage.sql.exec(
+			`SELECT id, request_body, created_at FROM requests ORDER BY created_at DESC LIMIT ${limit}`
+		);
+
+		const items = results.toArray();
+
+		return items.map(
+			(item) =>
+				({
+					id: item.id?.valueOf(),
+					requestBody: item.request_body?.valueOf(),
+					createdAt: item.created_at?.valueOf(),
+				} as { id: string; requestBody: string; createdAt: number })
+		);
 	}
 }
