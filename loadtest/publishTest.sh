@@ -1,6 +1,6 @@
 #!/bin/sh
 
-autocannon -a 5000 -c 600 -m POST -i ./loadtest/data.json \
+autocannon -a 4000 -c 700 -m POST -i ./loadtest/data.json \
   -H "Content-Type:application/json" \
-  -H "x-api-key: api_key_here" \
-  https://holding-theload.tiagorosadacost.workers.dev/new-events
+  -H "x-api-key: api_key_value" \
+  http://localhost:8787/new-events

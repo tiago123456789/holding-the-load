@@ -1,6 +1,12 @@
 import { Context, Hono } from 'hono';
 import { Env, Queue } from './queue/queue.js';
 import { cors } from 'hono/cors';
+import groups from './../groups.json' with { type: 'json' };
+
+const groupsAllowed: { [key: string]: boolean } = {};
+groups.forEach((group) => {
+	groupsAllowed[`${group}`] = true;
+});
 
 const app = new Hono();
 
@@ -26,42 +32,42 @@ app.use('*', async (c, next) => {
 function getQueueInstance(c: Context, id?: string) {
 	const env = c.env as Env;
 	let queueId;
-	queueId = env.QUEUE.idFromName('HOLDING_LOAD_DO');
+	if (!id) {
+		queueId = env.QUEUE.idFromName('DEFAULT');
+	} else {
+		if (!groupsAllowed[id]) {
+			throw new Error('Invalid group!');
+		}
+		queueId = env.QUEUE.idFromName(id);
+	}
 	const queueStub = env.QUEUE.get(queueId) as DurableObjectStub<Queue>;
 	return queueStub;
 }
 
-app.get('/health', async (c) => {
-	const queueStub = getQueueInstance(c);
-	await queueStub.setupAlarm();
-	return c.json({ ok: true });
-});
-
 app.post('/new-events', async (c) => {
 	const id = crypto.randomUUID();
-	const queueStub = getQueueInstance(c);
+	let groupId = c.req.query('groupId');
+	const queueStub = getQueueInstance(c, groupId);
 	const body = await c.req.json();
 
 	if (queueStub === null) {
 		return c.json({ message: 'Not found storage not found' }, 500);
 	}
 
-	const bodyAsString = JSON.stringify(body);
-	const isSqlInjection = /(DELETE|UPDATE|INSERT|SELECT)/.test(bodyAsString);
-	if (isSqlInjection) {
-		return c.json({ message: 'You can execute the action' }, 500);
-	}
-
-	await queueStub.add(id, body);
+	await queueStub.enqueue(id, body);
 	return c.json({ ok: true });
 });
 
 app.get('pull-events', async (c) => {
-	const queueStub = getQueueInstance(c);
 	let total = c.req.query('total') || 1;
-
+	let groupId = c.req.query('groupId');
+	const queueStub = getQueueInstance(c, groupId);
 	if (queueStub === null) {
 		return c.json({ message: 'Not found storage not found' }, 500);
+	}
+
+	if (total as number > 100) {
+		return c.json({ message: "Total value needs to be equal and less than 100" }, 400)
 	}
 
 	const result = await queueStub.pull(total as number);
@@ -69,7 +75,8 @@ app.get('pull-events', async (c) => {
 });
 
 app.get('stats', async (c) => {
-	const queueStub = getQueueInstance(c);
+	let groupId = c.req.query('groupId');
+	const queueStub = getQueueInstance(c, groupId);
 	if (queueStub === null) {
 		return c.json({ message: 'Not found storage not found' }, 500);
 	}
@@ -79,12 +86,14 @@ app.get('stats', async (c) => {
 });
 
 app.get('/dashboard', async (c) => {
-	const queueStub = getQueueInstance(c);
+	let groupId = c.req.query('groupId') || groups[0];
+	const queueStub = getQueueInstance(c, groupId);
 
 	if (queueStub === null) {
-		return c.html('<html><body><h1>Error</h1><p>Storage not found</p></body></html>', 500);
+		return c.html('<html><body><h1>Error</h1><p>Storage not found</p></body></html>', 404);
 	}
 
+	const apiKey = c.req.header('x-api-key') || c.req.query('x-api-key');
 	const stats = await queueStub.getStats();
 	const lastItems = await queueStub.getLastItems(10);
 	const itemsHtml = lastItems
@@ -128,8 +137,16 @@ app.get('/dashboard', async (c) => {
 			</head>
 			<body class="bg-gray-100 min-h-screen p-8">
 				<div class="max-w-8xl mx-auto bg-white p-8 rounded-lg shadow-md">
-					<h1 class="text-2xl font-bold mb-4 text-gray-800">Overview</h1>
-					<p class="text-lg text-gray-600 mb-6">Total Requests Waiting: <span class="font-semibold text-blue-600">${stats.totalRequestsWaiting}</span></p>
+					<h1 class="text-2xl font-bold mb-4 text-gray-800">Overview - ${groupId}</h1>
+					<div class="mb-4">
+						<label for="groupSelect" class="block text-sm font-medium text-gray-700">Select Group:</label>
+						<select id="groupSelect" onchange="changeGroup()" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+							${groups.map((g) => `<option value="${g}" ${g === groupId ? 'selected' : ''}>${g}</option>`).join('')}
+						</select>
+					</div>
+					<p class="text-lg text-gray-600 mb-6">Total Requests Waiting: <span class="font-semibold text-blue-600">${
+						stats.totalRequestsWaiting
+					}</span></p>
 					<h2 class="text-xl font-semibold mb-4 text-gray-800">Last 10 webhook requests</h2>
 					<table class="w-full">
 						<thead class="bg-gray-50">
@@ -152,6 +169,10 @@ app.get('/dashboard', async (c) => {
 					}
 					function closeModal(index) {
 						document.getElementById('modal-' + index).classList.add('hidden');
+					}
+					function changeGroup() {
+						const selected = document.getElementById('groupSelect').value;
+						window.location.href = '/dashboard?x-api-key=${apiKey}&groupId=' + encodeURIComponent(selected);
 					}
 				</script>
 			</body>
