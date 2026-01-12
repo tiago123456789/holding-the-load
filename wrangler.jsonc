@@ -25,8 +25,7 @@
 		}
 	],
 	"vars": {
-		"API_KEY": "",
-		"ENABLE_SAVE_MANY_ONE_ROW": false
+		"API_KEY": "api_key_value_here"
 	},
 	"compatibility_date": "2025-09-24"
 }

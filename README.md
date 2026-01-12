@@ -32,6 +32,7 @@ This is the motivation behind **Holding The Load**: Cloudflare handles spikes an
 
 - **Queue Management**: Efficiently queue incoming requests during high load.
 - **Batch Processing**: Pull requests individually or in batches.
+- **Group id**: seperate the webhooks based application or automation
 - **Scalable Storage**: Uses Durable Objects with SQLite for reliable data persistence.
 - **Cost-Effective**: Low-cost solution for handling traffic spikes.
 
@@ -64,7 +65,7 @@ This is the motivation behind **Holding The Load**: Cloudflare handles spikes an
 2. Set up the `API_KEY` in `wrangler.jsonc`
 3. Run `npm run dev` to run locally
 4. Run `npm run deploy` to deploy to Cloudflare (requires Wrangler CLI installed)
-5. You can import **Insomnia_2026-01-03.yaml** file on Insominia to test the routes
+5. You can import **Insomnia_2026-01-12.yaml** file on Insominia to test the routes
 6. Schedule request each 1 minute to call the route /health, so that way you make sure has a alarm to save data from memory to database.
 
 ## Environment Variables 🔧
