@@ -61,7 +61,11 @@ export class Queue extends DurableObject {
 
 	async setupAlarm() {
 		const alarm = await this.ctx.storage.getAlarm();
-		if (alarm || this.inMemoryMessages.length == 0) {
+		if (alarm) {
+			return;
+		}
+
+		if (this.inMemoryMessages.length == 0) {
 			return;
 		}
 
@@ -70,14 +74,14 @@ export class Queue extends DurableObject {
 		await this.ctx.storage.setAlarm(nextAlarmTime);
 	}
 
-	enqueue(id: string, requestBody: { [key: string]: any }) {
+	async enqueue(id: string, requestBody: { [key: string]: any }) {
 		this.inMemoryMessages.push({
 			id,
 			requestBody,
 			retries: 0,
 		});
 
-		this.setupAlarm();
+		await this.setupAlarm();
 	}
 
 	async alarm() {
