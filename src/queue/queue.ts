@@ -138,6 +138,10 @@ export class Queue extends DurableObject {
 	}
 
 	async getNext(limit: number = 1): Promise<Array<NewRequest>> {
+		const results = await this.ctx.storage.sql.exec(
+			`UPDATE requests SET status = ? WHERE id in (SELECT id FROM requests WHERE status = ? OR (visibility < ? AND status = ?) ORDER BY created_at ASC LIMIT ?) RETURNING id, request_body;`,
+			...[STATUS.PROCESSING, STATUS.PENDING, Date.now(), STATUS.PROCESSING, limit]
+		);
 		const items = results.toArray();
 
 		if (!items[0]) {
