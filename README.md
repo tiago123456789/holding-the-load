@@ -71,7 +71,6 @@ This is the motivation behind **Holding The Load**: Cloudflare handles spikes an
 ## Environment Variables 🔧
 
 - `API_KEY`: Protects the application and ensures only authorized applications can make requests
-- `ENABLE_SAVE_MANY_ONE_ROW`: If `true`, saves 20 requests in one row in SQLite storage. Batches until 20 requests accumulate before saving.
 
 ## Free Tier Limitations ⚠️
 
