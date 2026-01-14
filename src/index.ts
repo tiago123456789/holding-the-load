@@ -1,6 +1,7 @@
 import { Context, Hono } from 'hono';
 import { Env, Queue } from './queue/queue.js';
 import { cors } from 'hono/cors';
+import * as hasher from "./utils/hasher.js"
 import groups from './../groups.json' with { type: 'json' };
 
 const groupsAllowed: { [key: string]: boolean } = {};
@@ -45,7 +46,6 @@ function getQueueInstance(c: Context, id?: string) {
 }
 
 app.post('/new-events', async (c) => {
-	const id = crypto.randomUUID();
 	let groupId = c.req.query('groupId');
 	const queueStub = getQueueInstance(c, groupId);
 	const body = await c.req.json();
@@ -54,6 +54,8 @@ app.post('/new-events', async (c) => {
 		return c.json({ message: 'Not found storage not found' }, 500);
 	}
 
+	const jsonString = JSON.stringify(body); 
+  	const id = await hasher.get(jsonString)
 	await queueStub.enqueue(id, body);
 	return c.json({ ok: true });
 });
