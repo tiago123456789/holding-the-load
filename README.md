@@ -35,6 +35,8 @@ This is the motivation behind **Holding The Load**: Cloudflare handles spikes an
 - **Group id**: seperate the webhooks based application or automation. Ps: to add your own Group ids open the file **groups.json** on root of project.
 - **Scalable Storage**: Uses Durable Objects with SQLite for reliable data persistence.
 - **Cost-Effective**: Low-cost solution for handling traffic spikes.
+- **Idempotency id**: Mechanism to avoid duplicated webhook requests.
+- **the request body validation**: Validate the incoming webhook requests based on group id.
 
 ## Cost Simulation 💰
 
