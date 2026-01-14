@@ -89,6 +89,54 @@ Upgrade to the $5 plan. Learn more: [Cloudflare Workers Pricing](https://develop
 
 ![Architecture](./architecture.png)
 
+## Example how to receive and consume the Webhooks
+
+### Webhook request received
+
+```
+Request:
+curl --request POST \
+  --url http://localhost:8787/new-events \
+  --header 'Content-Type: application/json' \
+  --header 'User-Agent: insomnia/11.0.2' \
+  --header 'x-api-key: api_key_here' \
+  --data '{
+	"message": "Hi 80e58d1f-067d-4d82-b064-54ea736d3a3b",
+	"timestamp": "1751872147530"
+}'
+
+Response:
+{
+	"ok": true
+}
+```
+
+### Get the webhook request received
+
+```
+Request:
+curl --request GET \
+  --url 'http://localhost:8787/pull-events?total=1' \
+  --header 'Content-Type: application/json' \
+  --header 'User-Agent: insomnia/11.0.2' \
+  --header 'x-api-key: api_key_value'
+
+Response:
+[
+	{
+		"id": "f2d56c90-0fd0-4137-8b09-b5fb391a6685",
+		"requestBody": {
+			"message": "Hi d84af276-5e64-4a7b-a67a-0acb93fbfe21",
+			"timestamp": "1793123847723"
+		},
+		"retries": 0
+	}
+]
+
+Response(when doens't have webhook to process)
+[]
+```
+
 ## Load Tests 🧪
 
 This section demonstrates how to simulate a spike and shows the simulation results. The simulation involves 5000 requests executed by 600 concurrent fake users using the autocannon library.
