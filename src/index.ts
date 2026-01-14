@@ -3,6 +3,9 @@ import { Env, Queue } from './queue/queue.js';
 import { cors } from 'hono/cors';
 import * as hasher from "./utils/hasher.js"
 import groups from './../groups.json' with { type: 'json' };
+import z from "zod"
+import SCHEMAS_VALIDATIONS from './schemas-validation.js';
+import * as groupUtil from "./utils/group.js"
 
 const groupsAllowed: { [key: string]: boolean } = {};
 groups.forEach((group) => {
@@ -32,15 +35,7 @@ app.use('*', async (c, next) => {
 
 function getQueueInstance(c: Context, id?: string) {
 	const env = c.env as Env;
-	let queueId;
-	if (!id) {
-		queueId = env.QUEUE.idFromName('DEFAULT');
-	} else {
-		if (!groupsAllowed[id]) {
-			throw new Error('Invalid group!');
-		}
-		queueId = env.QUEUE.idFromName(id);
-	}
+	let queueId = env.QUEUE.idFromName(groupUtil.get(id));
 	const queueStub = env.QUEUE.get(queueId) as DurableObjectStub<Queue>;
 	return queueStub;
 }
@@ -49,9 +44,26 @@ app.post('/new-events', async (c) => {
 	let groupId = c.req.query('groupId');
 	const queueStub = getQueueInstance(c, groupId);
 	const body = await c.req.json();
-
 	if (queueStub === null) {
 		return c.json({ message: 'Not found storage not found' }, 500);
+	}
+
+	if (!groupsAllowed[groupUtil.get(groupId)]) {
+		return c.json({ message: 'Group id not found' }, 404);
+	}
+
+	try {
+		const schema = SCHEMAS_VALIDATIONS[groupUtil.get(groupId)] || null
+		if (schema) {
+			schema.parse(body);
+		}
+	} catch (error) {
+		if (error instanceof z.ZodError) {
+			return c.json({
+				message: "Validation failed",
+				error: JSON.parse(error.message)
+			});
+		}
 	}
 
 	const jsonString = JSON.stringify(body); 
@@ -60,21 +72,6 @@ app.post('/new-events', async (c) => {
 	return c.json({ ok: true });
 });
 
-app.get('pull-events', async (c) => {
-	let total = c.req.query('total') || 1;
-	let groupId = c.req.query('groupId');
-	const queueStub = getQueueInstance(c, groupId);
-	if (queueStub === null) {
-		return c.json({ message: 'Not found storage not found' }, 500);
-	}
-
-	if (total as number > 100) {
-		return c.json({ message: "Total value needs to be equal and less than 100" }, 400)
-	}
-
-	const result = await queueStub.pull(total as number);
-	return c.json(result);
-});
 
 app.get('stats', async (c) => {
 	let groupId = c.req.query('groupId');
