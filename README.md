@@ -49,8 +49,7 @@ This is the motivation behind **Holding The Load**: Cloudflare handles spikes an
 
 - Copy the JSON structure you are expecting
 - Access the website https://transform.tools/json-to-zod
-- On JSON section paste the json
-- For example:
+- On JSON section paste the json. For example:
 
 ```json
 {
