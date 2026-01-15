@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 const SCHEMAS_VALIDATIONS: { [key: string]: z.Schema } = {
-	QUEUE1: z.object({}),
 	QUEUE2: z.object({ message: z.string(), timestamp: z.number() }),
 	DEFAULT: z.object({
 		results: z.array(

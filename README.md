@@ -38,6 +38,69 @@ This is the motivation behind **Holding The Load**: Cloudflare handles spikes an
 - **Idempotency id**: Mechanism to avoid duplicated webhook requests.
 - **the request body validation**: Validate the incoming webhook requests based on group id.
 
+### Features details
+
+#### How to setup a new Group id
+
+- Access the file ./groups.json
+- Add a new value on the list. PS: no use special characters, for example: queue_user, queue_product, queue_chatbot_customer_1 and etc.
+
+#### How to setup the request body validation
+
+- Copy the JSON structure you are expecting
+- Access the website https://transform.tools/json-to-zod
+- On JSON section paste the json
+- For example:
+
+```json
+{
+	"userId": 1,
+	"id": 1,
+	"title": "delectus aut autem",
+	"completed": false
+}
+```
+
+- The website will generate the Zod schema something like that:
+
+```js
+import { z } from 'zod';
+
+export const schema = z.object({
+	userId: z.number(),
+	id: z.number(),
+	title: z.string(),
+	completed: z.boolean(),
+});
+```
+
+- Copy the following part:
+
+```js
+z.object({
+	userId: z.number(),
+	id: z.number(),
+	title: z.string(),
+	completed: z.boolean(),
+});
+```
+
+- Access the file src/schemas-validation.ts
+- Add a group id as **key** and as value paste the value copied. Example:
+
+```json
+const SCHEMAS_VALIDATIONS: { [key: string]: z.Schema } = {
+	group_id_value_here: z.object({
+		userId: z.number(),
+		id: z.number(),
+		title: z.string(),
+		completed: z.boolean()
+	}),
+};
+```
+
+- When you receive a webhook on route /new-events?groupId=group_id_value_here will automatically identify if has validation to apply for the group id, case yes, apply the validation.
+
 ## Cost Simulation 💰
 
 **Scenario:** 10 million requests per month, 7ms CPU time using Cloudflare Workers and Durable Objects with SQLite storage.
