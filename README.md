@@ -1,211 +1,178 @@
 # Holding The Load 🚀
 
-A Cloudflare-based solution to handle high loads and queue requests efficiently.
+[Portuguese Version](README-pt.md)
+
+A simple and smart way to manage busy times for your web apps, built on Cloudflare. It protects your server from getting overwhelmed by too many requests at once, like a traffic jam controller for the internet.
+
+This project helps keep your affordable server (VPS) safe from sudden spikes in webhook requests, preventing crashes and keeping things running smoothly.
+
+## When Should You Use It? 🤔
+
+- **Automation Tools**: Like N8N or similar, where you need to handle events from other services.
+- **Self-Hosted Workflows**: For engines that react to webhook events.
+- **APIs**: Any app that receives notifications or data pushes.
+- **AI Agents**: Bots or assistants that respond to events via webhooks.
+
+## Why Use It? Benefits ✨
+
+- **Handles Busy Times**: Webhook spikes are managed before they reach your server, so it stays stable.
+- **Predictable Workload**: Your server runs smoothly without surprises.
+- **Save Money**: No need to pay for extra power all the time—just when you need it.
+- **No Lost Data**: Even if your server goes down temporarily, webhooks are safely stored and not lost.
 
 ## Table of Contents 📋
 
-- [About](#about-)
-- [When to Use It](#when-to-use-it-)
-- [Features](#features-)
-- [Cost Simulation](#cost-simulation-)
-- [Technologies](#technologies-)
-- [How to Run](#how-to-run-)
-- [Environment Variables](#environment-variables-)
-- [Free Tier Limitations](#free-tier-limitations-)
-- [Architecture](#architecture)
-- [Load Tests](#load-tests)
-- [Support](#support)
+- [What is This?](#what-is-this-)
+- [When to Use It](#when-should-you-use-it-)
+- [Benefits](#why-use-it-benefits-)
+- [Key Features](#key-features-)
+- [Cost Estimate](#cost-estimate-)
+- [Tech Behind It](#tech-behind-it-)
+- [Getting Started](#getting-started-)
+- [Settings](#settings-)
+- [Free Plan Limits](#free-plan-limits-)
+- [How It Works](#how-it-works-)
+- [Examples](#examples-)
+- [Testing](#testing-)
+- [Get Help](#get-help-)
 
-## About 📖
+## What is This? 📖
 
-This project leverages Cloudflare infrastructure (Workers + Durable Objects with SQLite storage) to manage load spikes effectively. You can pull requests one by one or in batches (e.g., 10 at a time).
+This tool uses Cloudflare's powerful infrastructure (like smart workers and reliable storage) to handle sudden rushes of requests. You can process them one at a time or in small groups, at your own speed.
 
 ## When to Use It 💡
 
-Imagine running automation on N8N in a VPS (a rented computer) that's not powerful enough—powerful computers are expensive. As your AI chatbot or app gains popularity, it starts receiving many requests throughout the day, overwhelming the VPS. You need to upgrade the VPS, which costs more, and if demand grows again, you upgrade again, getting more expensive each time.
+Picture this: You're running an app on a budget server that's not super powerful—because powerful ones cost more. As your app or chatbot gets popular, it starts getting tons of requests all day, overloading the server. You have to upgrade to a bigger, more expensive server, and if it gets even busier, you upgrade again... and again.
 
-How can you solve this?
+**Holding The Load** solves this! Cloudflare takes care of the busy times and unexpected traffic, while you pull in requests at a pace that matches your server's strength.
 
-This is the motivation behind **Holding The Load**: Cloudflare handles spikes and unexpected demand, while you pull requests at your own pace based on your VPS resources.
+## Key Features ✨
 
-## Features ✨
+- **Smart Queuing**: Lines up incoming requests during busy periods so nothing gets missed.
+- **Flexible Processing**: Pull requests one by one or in batches (like 10 at a time).
+- **Group Organization**: Separate webhooks by app or task. (To add your own groups, edit the `groups.json` file in the project root.)
+- **Reliable Storage**: Uses advanced storage to keep data safe.
+- **Budget-Friendly**: Low cost for handling traffic bursts.
+- **Duplicate Prevention**: Stops the same request from being processed twice.
+- **Data Checking**: Validates incoming requests based on your group settings.
 
-- **Queue Management**: Efficiently queue incoming requests during high load.
-- **Batch Processing**: Pull requests individually or in batches.
-- **Group id**: seperate the webhooks based application or automation. Ps: to add your own Group ids open the file **groups.json** on root of project.
-- **Scalable Storage**: Uses Durable Objects with SQLite for reliable data persistence.
-- **Cost-Effective**: Low-cost solution for handling traffic spikes.
-- **Idempotency id**: Mechanism to avoid duplicated webhook requests.
-- **the request body validation**: Validate the incoming webhook requests based on group id.
+### Setting Up Groups
 
-### Features details
+1. Open the `groups.json` file.
+2. Add a new name to the list. (Use simple names without special characters, like `user_queue`, `product_updates`, `chatbot_support`.)
 
-#### How to setup a new Group id
+### Setting Up Data Validation
 
-- Access the file ./groups.json
-- Add a new value on the list. PS: no use special characters, for example: queue_user, queue_product, queue_chatbot_customer_1 and etc.
+1. Take the JSON structure you expect for your data.
+2. Go to [this website](https://transform.tools/json-to-zod) and paste your JSON.
+3. It will create a simple code snippet.
+4. Copy the part that looks like `z.object({...})`.
+5. Open `src/schemas-validation.ts` and add your group name as a key, with the copied code as the value.
+6. Now, when webhooks come in for that group, they'll be checked automatically.
 
-#### How to setup the request body validation
+## Cost Estimate 💰
 
-- Copy the JSON structure you are expecting
-- Access the website https://transform.tools/json-to-zod
-- On JSON section paste the json. For example:
+**Example**: 10 million requests per month, using Cloudflare's services.
 
-```json
-{
-	"userId": 1,
-	"id": 1,
-	"title": "delectus aut autem",
-	"completed": false
-}
-```
+### Breakdown
 
-- The website will generate the Zod schema something like that:
+| Part             | Details                        | Monthly Cost |
+| ---------------- | ------------------------------ | ------------ |
+| Basic Plan       | Cloudflare Workers Paid Plan   | $5.00        |
+| Requests         | 10M (included)                 | $0.00        |
+| Processing Time  | Extra time beyond free         | $0.80        |
+| Storage Requests | 10M                            | $0.50        |
+| Storage Writes   | 500k (included)                | $0.00        |
+| Storage Reads    | Based on your setup (included) | $0.00        |
+| **Total**        |                                | **$6.30**    |
 
-```js
-import { z } from 'zod';
+## Tech Behind It 🛠️
 
-export const schema = z.object({
-	userId: z.number(),
-	id: z.number(),
-	title: z.string(),
-	completed: z.boolean(),
-});
-```
+- Cloudflare Workers (handles the heavy lifting)
+- Durable Objects with SQLite (safe data storage)
+- Node.js (v21.0.0) and TypeScript (for coding)
 
-- Copy the following part:
+## Getting Started 🏃‍♂️
 
-```js
-z.object({
-	userId: z.number(),
-	id: z.number(),
-	title: z.string(),
-	completed: z.boolean(),
-});
-```
+1. **Download the Project**: Clone it to your computer.
+2. **Set Up Security**: Add your `API_KEY` in `wrangler.jsonc`.
+3. **Test Locally**: Run `npm run dev` to try it on your machine.
+4. **Go Live**: Run `npm run deploy` to put it on Cloudflare (needs Wrangler CLI).
+5. **Test the Routes**: Import `Insomnia_2026-01-12.yaml` into Insomnia to test.
+6. **Keep It Healthy**: Set up a schedule to call `/health` every minute to save data safely.
 
-- Access the file src/schemas-validation.ts
-- Add a group id as **key** and as value paste the value copied. Example:
+## Settings 🔧
 
-```json
-const SCHEMAS_VALIDATIONS: { [key: string]: z.Schema } = {
-	group_id_value_here: z.object({
-		userId: z.number(),
-		id: z.number(),
-		title: z.string(),
-		completed: z.boolean()
-	}),
-};
-```
+- `API_KEY`: A secret key to protect your app—only authorized apps can send requests.
 
-- When you receive a webhook on route /new-events?groupId=group_id_value_here will automatically identify if has validation to apply for the group id, case yes, apply the validation.
+## Free Plan Limits ⚠️
 
-## Cost Simulation 💰
-
-**Scenario:** 10 million requests per month, 7ms CPU time using Cloudflare Workers and Durable Objects with SQLite storage.
-
-### Cost Breakdown
-
-| Component                             | Usage Details                                          | Monthly Cost |
-| ------------------------------------- | ------------------------------------------------------ | ------------ |
-| Base Subscription (Workers Paid Plan) | -                                                      | $5.00        |
-| Worker Requests                       | 10M total (included in plan)                           | $0.00        |
-| CPU Time                              | 70M ms total (30M included; 40M overage @ $0.02/1M ms) | $0.80        |
-| DO Requests                           | 10M total (@ $0.15/1M requests)                        | $0.50        |
-| DO SQL Writes                         | 500k total (included in plan)                          | $0.00        |
-| DO SQL Reads                          | Dependent on logic (included in plan)                  | $0.00        |
-| **Total Estimated**                   |                                                        | **$6.30**    |
-
-## Technologies 🛠️
-
-- Cloudflare Workers
-- Durable Objects (SQLite storage)
-- Node.js (v21.0.0)
-- TypeScript
-
-## How to Run 🏃‍♂️
-
-1. Clone the project
-2. Set up the `API_KEY` in `wrangler.jsonc`
-3. Run `npm run dev` to run locally
-4. Run `npm run deploy` to deploy to Cloudflare (requires Wrangler CLI installed)
-5. You can import **Insomnia_2026-01-12.yaml** file on Insominia to test the routes
-6. Schedule request each 1 minute to call the route /health, so that way you make sure has a alarm to save data from memory to database.
-
-## Environment Variables 🔧
-
-- `API_KEY`: Protects the application and ensures only authorized applications can make requests
-
-## Free Tier Limitations ⚠️
-
-The free tier has limitations:
+The free plan has some limits:
 
 - 100,000 requests per day
-- 128MB Durable Object memory limit
+- 128MB storage memory
 - 1,000 requests per minute
-- 100,000 writes per day to Durable Object SQLite storage
+- 100,000 data writes per day
 
-### Need More Than the Free Tier?
+### Need More?
 
-Upgrade to the $5 plan. Learn more: [Cloudflare Workers Pricing](https://developers.cloudflare.com/workers/platform/pricing/)
+Upgrade to the $5 plan for more power. Check [Cloudflare Pricing](https://developers.cloudflare.com/workers/platform/pricing/).
 
-## Architecture
+## How It Works
 
 ![Architecture](./architecture.png)
 
-## Example how to receive and consume the Webhooks
+## Examples
 
-### Webhook request received
+### Sending a Webhook
 
 ```
 Request:
 curl --request POST \
   --url http://localhost:8787/new-events \
   --header 'Content-Type: application/json' \
-  --header 'User-Agent: insomnia/11.0.2' \
-  --header 'x-api-key: api_key_here' \
+  --header 'x-api-key: your_api_key' \
   --data '{
-	"message": "Hi 80e58d1f-067d-4d82-b064-54ea736d3a3b",
-	"timestamp": "1751872147530"
-}'
+    "message": "Hello from user 123",
+    "timestamp": "1751872147530"
+  }'
 
 Response:
 {
-	"ok": true
+    "ok": true
 }
 ```
 
-### Get the webhook request received
+### Getting Webhooks to Process
 
 ```
 Request:
 curl --request GET \
   --url 'http://localhost:8787/pull-events?total=1' \
   --header 'Content-Type: application/json' \
-  --header 'User-Agent: insomnia/11.0.2' \
-  --header 'x-api-key: api_key_value'
+  --header 'x-api-key: your_api_key'
 
-Response:
+Response (with data):
 [
-	{
-		"id": "f2d56c90-0fd0-4137-8b09-b5fb391a6685",
-		"requestBody": {
-			"message": "Hi d84af276-5e64-4a7b-a67a-0acb93fbfe21",
-			"timestamp": "1793123847723"
-		},
-		"retries": 0
-	}
+    {
+        "id": "unique-id-here",
+        "requestBody": {
+            "message": "Hello from user 456",
+            "timestamp": "1793123847723"
+        },
+        "retries": 0
+    }
 ]
 
-Response(when doens't have webhook to process)
+Response (nothing to process):
 []
 ```
 
-## Load Tests 🧪
+## Testing 🧪
 
-This section demonstrates how to simulate a spike and shows the simulation results. The simulation involves 5000 requests executed by 600 concurrent fake users using the autocannon library.
+We tested with 5,000 requests from 600 fake users using a tool called autocannon. Here are the results:
 
-### Results with `ENABLE_SAVE_MANY_ONE_ROW` Disabled
+### Without Extra Saving
 
 ```
 ┌─────────┬────────┬────────┬─────────┬─────────┬───────────┬───────────┬─────────┐
@@ -219,10 +186,10 @@ This section demonstrates how to simulate a spike and shows the simulation resul
 │ Req/Sec   │ 0   │ 0    │ 850    │ 2,405   │ 1,250  │ 908.51 │ 850    │
 ├───────────┼─────┼──────┼────────┼─────────┼────────┼────────┼────────┤
 │ Bytes/Sec │ 0 B │ 0 B  │ 523 kB │ 1.48 MB │ 769 kB │ 559 kB │ 523 kB │
-└───────────┴─────┴──────┴────────┴─────────┴────────┴────────┴────────┘
+└───────────┴─────┴──────┴────────┴────────┴────────┴────────┴────────┘
 ```
 
-### Results with `ENABLE_SAVE_MANY_ONE_ROW` Enabled
+### With Extra Saving Enabled
 
 ```
 ┌─────────┬────────┬────────┬─────────┬─────────┬───────────┬──────────┬─────────┐
@@ -236,11 +203,11 @@ This section demonstrates how to simulate a spike and shows the simulation resul
 │ Req/Sec   │ 0   │ 0    │ 821    │ 2,307   │ 1,250  │ 901.49 │ 821    │
 ├───────────┼─────┼──────┼────────┼─────────┼────────┼────────┼────────┤
 │ Bytes/Sec │ 0 B │ 0 B  │ 505 kB │ 1.42 MB │ 769 kB │ 555 kB │ 505 kB │
-└───────────┴─────┴──────┴────────┴─────────┴────────┴────────┴────────┘
+└───────────┴─────┴──────┴────────┴────────┴────────┴────────┘
 ```
 
-## Support 🤝
+## Get Help 🤝
 
-Need help setting up? Or struggling with a problem on your micro-SaaS or SaaS?
+Stuck setting this up? Or having issues with your app?
 
-Contact me via email: [tiagorosadacost@gmail.com](mailto:tiagorosadacost@gmail.com)
+Email me: [tiagorosadacost@gmail.com](mailto:tiagorosadacost@gmail.com)
