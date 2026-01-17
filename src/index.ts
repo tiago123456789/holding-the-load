@@ -62,7 +62,7 @@ app.post('/new-events', async (c) => {
 			return c.json({
 				message: "Validation failed",
 				error: JSON.parse(error.message)
-			});
+			}, 400);
 		}
 	}
 
