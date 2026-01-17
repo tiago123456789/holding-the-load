@@ -1,4 +1,4 @@
-# Holding The Load 🚀
+# Holding The Load
 
 [Portuguese Version](README-pt.md)
 
@@ -6,21 +6,27 @@ A simple and smart way to manage busy times for your web apps, built on Cloudfla
 
 This project helps keep your affordable server (VPS) safe from sudden spikes in webhook requests, preventing crashes and keeping things running smoothly.
 
-## When Should You Use It? 🤔
+## When Should You Use It?
 
 - **Automation Tools**: Like N8N or similar, where you need to handle events from other services.
 - **Self-Hosted Workflows**: For engines that react to webhook events.
 - **APIs**: Any app that receives notifications or data pushes.
 - **AI Agents**: Bots or assistants that respond to events via webhooks.
 
-## Why Use It? Benefits ✨
+## Why Use It? Benefits
 
 - **Handles Busy Times**: Webhook spikes are managed before they reach your server, so it stays stable.
 - **Predictable Workload**: Your server runs smoothly without surprises.
 - **Save Money**: No need to pay for extra power all the time—just when you need it.
 - **No Lost Data**: Even if your server goes down temporarily, webhooks are safely stored and not lost.
 
-## Table of Contents 📋
+## Get Help
+
+Stuck setting this up? Or having issues with your app?
+
+Email me: [tiagorosadacost@gmail.com](mailto:tiagorosadacost@gmail.com)
+
+## Table of Contents
 
 - [What is This?](#what-is-this-)
 - [When to Use It](#when-should-you-use-it-)
@@ -36,17 +42,17 @@ This project helps keep your affordable server (VPS) safe from sudden spikes in 
 - [Testing](#testing-)
 - [Get Help](#get-help-)
 
-## What is This? 📖
+## What is This?
 
 This tool uses Cloudflare's powerful infrastructure (like smart workers and reliable storage) to handle sudden rushes of requests. You can process them one at a time or in small groups, at your own speed.
 
-## When to Use It 💡
+## When to Use It
 
 Picture this: You're running an app on a budget server that's not super powerful—because powerful ones cost more. As your app or chatbot gets popular, it starts getting tons of requests all day, overloading the server. You have to upgrade to a bigger, more expensive server, and if it gets even busier, you upgrade again... and again.
 
 **Holding The Load** solves this! Cloudflare takes care of the busy times and unexpected traffic, while you pull in requests at a pace that matches your server's strength.
 
-## Key Features ✨
+## Key Features
 
 - **Smart Queuing**: Lines up incoming requests during busy periods so nothing gets missed.
 - **Flexible Processing**: Pull requests one by one or in batches (like 10 at a time).
@@ -70,7 +76,7 @@ Picture this: You're running an app on a budget server that's not super powerful
 5. Open `src/schemas-validation.ts` and add your group name as a key, with the copied code as the value.
 6. Now, when webhooks come in for that group, they'll be checked automatically.
 
-## Cost Estimate 💰
+## Cost Estimate
 
 **Example**: 10 million requests per month, using Cloudflare's services.
 
@@ -86,13 +92,13 @@ Picture this: You're running an app on a budget server that's not super powerful
 | Storage Reads    | Based on your setup (included) | $0.00        |
 | **Total**        |                                | **$6.30**    |
 
-## Tech Behind It 🛠️
+## Tech Behind It
 
 - Cloudflare Workers (handles the heavy lifting)
 - Durable Objects with SQLite (safe data storage)
 - Node.js (v21.0.0) and TypeScript (for coding)
 
-## Getting Started 🏃‍♂️
+## Getting Started
 
 1. **Download the Project**: Clone it to your computer.
 2. **Set Up Security**: Add your `API_KEY` in `wrangler.jsonc`.
@@ -101,11 +107,11 @@ Picture this: You're running an app on a budget server that's not super powerful
 5. **Test the Routes**: Import `Insomnia_2026-01-12.yaml` into Insomnia to test.
 6. **Keep It Healthy**: Set up a schedule to call `/health` every minute to save data safely.
 
-## Settings 🔧
+## Settings
 
 - `API_KEY`: A secret key to protect your app—only authorized apps can send requests.
 
-## Free Plan Limits ⚠️
+## Free Plan Limits
 
 The free plan has some limits:
 
@@ -168,28 +174,9 @@ Response (nothing to process):
 []
 ```
 
-## Testing 🧪
+## Testing
 
 We tested with 5,000 requests from 600 fake users using a tool called autocannon. Here are the results:
-
-### Without Extra Saving
-
-```
-┌─────────┬────────┬────────┬─────────┬─────────┬───────────┬───────────┬─────────┐
-│ Stat    │ 2.5%   │ 50%    │ 97.5%   │ 99%     │ Avg       │ Stdev     │ Max     │
-├─────────┼────────┼─────────┼─────────┼─────────┼───────────┼───────────┼─────────┤
-│ Latency │ 153 ms │ 216 ms │ 1921 ms │ 1981 ms │ 427.63 ms │ 484.17 ms │ 2050 ms │
-└─────────┴────────┴────────┴─────────┴─────────┴───────────┴───────────┴─────────┘
-┌───────────┬─────┬──────┬────────┬─────────┬────────┬────────┬────────┐
-│ Stat      │ 1%  │ 2.5% │ 50%    │ 97.5%   │ Avg    │ Stdev  │ Min    │
-├───────────┼─────┼──────┼────────┼─────────┼────────┼────────┼────────┤
-│ Req/Sec   │ 0   │ 0    │ 850    │ 2,405   │ 1,250  │ 908.51 │ 850    │
-├───────────┼─────┼──────┼────────┼─────────┼────────┼────────┼────────┤
-│ Bytes/Sec │ 0 B │ 0 B  │ 523 kB │ 1.48 MB │ 769 kB │ 559 kB │ 523 kB │
-└───────────┴─────┴──────┴────────┴────────┴────────┴────────┴────────┘
-```
-
-### With Extra Saving Enabled
 
 ```
 ┌─────────┬────────┬────────┬─────────┬─────────┬───────────┬──────────┬─────────┐
@@ -205,9 +192,3 @@ We tested with 5,000 requests from 600 fake users using a tool called autocannon
 │ Bytes/Sec │ 0 B │ 0 B  │ 505 kB │ 1.42 MB │ 769 kB │ 555 kB │ 505 kB │
 └───────────┴─────┴──────┴────────┴────────┴────────┴────────┘
 ```
-
-## Get Help 🤝
-
-Stuck setting this up? Or having issues with your app?
-
-Email me: [tiagorosadacost@gmail.com](mailto:tiagorosadacost@gmail.com)
