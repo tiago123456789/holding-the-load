@@ -78,6 +78,7 @@ app.post('/new-events', async (c) => {
 app.get('pull-events', async (c) => {
 	let total = c.req.query('total') || 1;
 	let groupId = c.req.query('groupId');
+
 	const queueStub = getQueueInstance(c, groupId);
 	if (queueStub === null) {
 		return c.json({ message: 'Not found storage not found' }, 500);
